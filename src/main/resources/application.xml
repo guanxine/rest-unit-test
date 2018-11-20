@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://cxf.apache.org/jaxrs
+http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <context:component-scan base-package="com.k2data.demo.rest.unit"/>
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <!-- Ignore property that value is null -->
+        <property name="serializationInclusion" value="NON_NULL"/>
+    </bean>
+    <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider">
+        <property name="mapper" ref="objectMapper"/>
+    </bean>
+
+
+
+    <bean id="unitWebService" class="com.k2data.demo.rest.unit.web.service.UnitWebService"></bean>
+
+    <jaxrs:server id="rest-unit-test" address="/">
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+        </jaxrs:providers>
+        <jaxrs:serviceBeans>
+            <ref bean="unitWebService"></ref>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+</beans>
