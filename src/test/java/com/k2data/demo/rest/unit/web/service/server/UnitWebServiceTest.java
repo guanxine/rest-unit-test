@@ -1,5 +1,4 @@
-package com.k2data.demo.rest.unit.web.service;
-
+package com.k2data.demo.rest.unit.web.service.server;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -13,26 +12,35 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.SocketUtils;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Created by guanxine on 18-11-19.
+ * 通过 Spring 启动一个 cxf 内嵌的服务
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(locations = {"classpath:test-application.xml"})
+@ContextConfiguration(locations = {"classpath:cxf-test.xml"})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
-public class ENEWebServiceTest {
-
+public class UnitWebServiceTest {
 
     private String baseUrl;
     private RequestSpecification spec;
+
+    @Autowired
+    MockHttpSession session;
+    @Autowired
+    MockHttpServletRequest request;
 
     @BeforeClass
     public static void configure() {
@@ -43,7 +51,6 @@ public class ENEWebServiceTest {
     @Before
     public void setUp() {
         this.baseUrl = "http://localhost:" + System.getProperty("servicePort") + "/rest-unit-test";
-
         spec = new RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
                 .setBaseUri(baseUrl)
@@ -52,14 +59,17 @@ public class ENEWebServiceTest {
                 .build();
     }
 
-
     @Test
-    public void webUnit() {
+    public void create() {
         given().spec(spec)
-                .when()// req
-                .get("unit/web")// res
-                .then()//res
-                .statusCode(200);
-
+                .contentType(ContentType.JSON)
+                .body("{\n" +
+                        "    \"id\": 1,\n" +
+                        "    \"unit\": \"a rest unit test\"\n" +
+                        "}")
+                .when().post("unit").then()//res
+                .statusCode(200)
+                .body("code", equalTo(0))
+                .body("body.id", equalTo(1));
     }
 }

@@ -1,5 +1,6 @@
 package com.k2data.demo.rest.unit.dao;
 
+import com.k2data.demo.rest.unit.entity.UnitDo;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -7,8 +8,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class UnitDao {
-    public void daoUnit() {
 
-        System.out.println("dao");
+    public int create(UnitDo unitDo) {
+        // save unit do
+        return unitDo.getId();
     }
 }
